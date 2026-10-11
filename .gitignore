@@ -1,0 +1,4 @@
+.venv/
+--pycache--/
+*.pyc
+game_state.jsonl
