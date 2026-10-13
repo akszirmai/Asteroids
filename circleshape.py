@@ -28,3 +28,7 @@ class CircleShape(pygame.sprite.Sprite):
     def update(self, dt: float) -> None:
         # must override
         pass
+
+    def collides_with(self, other: "CircleShape") -> bool:   #"" is needed around the CircleShape type hint, otherwise Python lintner indicates an error.
+        dist: float = self.position.distance_to(other.position)
+        return dist <= self.radius + other.radius

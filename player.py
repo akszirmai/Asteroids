@@ -1,14 +1,17 @@
 from typing import override
 
 import pygame
+from pygame.math import Vector2
 
 from circleshape import CircleShape
-from constants import LINE_WIDTH, PLAYER_RADIUS, PLAYER_SPEED, PLAYER_TURN_SPEED
+from constants import LINE_WIDTH, PLAYER_RADIUS, PLAYER_SHOOT_COOLDOWN_SECONDS, PLAYER_SPEED, PLAYER_TURN_SPEED, PLAYER_SHOT_SPEED
+from shot import Shot
 
 
 class Player(CircleShape):
     rotation : int
     position : pygame.Vector2
+    shoot_cooldown_tmr : float = 0.0
 
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
@@ -31,19 +34,31 @@ class Player(CircleShape):
 
     @override
     def update(self, dt: float) -> None:
-            keys = pygame.key.get_pressed()
+        self.shoot_cooldown_tmr -= dt
+        keys = pygame.key.get_pressed()
 
-            if keys[pygame.K_a]:
-                self.rotate(dt)
-            if keys[pygame.K_d]:
-                self.rotate(-dt)
-            if keys[pygame.K_w]:
-                self.move(dt)
-            if keys[pygame.K_s]:
-                self.move(-dt)
+        if keys[pygame.K_a]:
+            self.rotate(dt)
+        if keys[pygame.K_d]:
+            self.rotate(-dt)
+        if keys[pygame.K_w]:
+            self.move(dt)
+        if keys[pygame.K_s]:
+            self.move(-dt)
+        if keys[pygame.K_SPACE]:
+            self.shoot()
 
     def move(self, dt: float) -> None:
         unit_vector = pygame.Vector2(0, 1)
         rotated_vector = unit_vector.rotate(self.rotation)
         rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
         self.position += rotated_with_speed_vector
+
+    def shoot(self) -> None:
+        if self.shoot_cooldown_tmr <= 0:
+            self.shoot_cooldown_tmr = PLAYER_SHOOT_COOLDOWN_SECONDS
+            shot = Shot(self.position.x, self.position.y)
+            unit_vector = pygame.Vector2(0, 1)
+            rotated_vector = unit_vector.rotate(self.rotation)
+            rotated_with_speed_vector = rotated_vector * PLAYER_SHOT_SPEED
+            shot.velocity = rotated_with_speed_vector
