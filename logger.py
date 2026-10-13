@@ -128,7 +128,7 @@ def log_state() -> None:
     # New log file on each run
     mode = "w" if not _state_log_initialized else "a"
     with open("game_state.jsonl", mode) as f:
-        f.write(json.dumps(entry) + "\n")
+        _ = f.write(json.dumps(entry) + "\n")
 
     _state_log_initialized = True
 
@@ -148,6 +148,6 @@ def log_event(event_type: str, **details: object) -> None:
 
     mode = "w" if not _event_log_initialized else "a"
     with open("game_events.jsonl", mode) as f:
-        f.write(json.dumps(event) + "\n")
+        _ = f.write(json.dumps(event) + "\n")
 
     _event_log_initialized = True
